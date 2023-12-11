@@ -1,6 +1,6 @@
-const LoadMoreButton = props => {
+const LoadMoreButton = ({ onClick }) => {
   return (
-    <button className="Button" type="button" onClick={props.onClick}>
+    <button className="Button" type="button" onClick={onClick}>
       Load more
     </button>
   );

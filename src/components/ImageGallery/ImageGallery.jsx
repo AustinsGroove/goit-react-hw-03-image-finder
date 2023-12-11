@@ -1,14 +1,10 @@
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
-const ImageGallery = props => {
+const ImageGallery = ({ images, openModal }) => {
   return (
     <ul className="ImageGallery">
-      {props.images.map(image => (
-        <ImageGalleryItem
-          key={image.id}
-          image={image}
-          openModal={props.openModal}
-        />
+      {images.map(image => (
+        <ImageGalleryItem key={image.id} image={image} openModal={openModal} />
       ))}
     </ul>
   );

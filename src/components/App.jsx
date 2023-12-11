@@ -23,6 +23,7 @@ class App extends Component {
     this.setState({
       query: query,
       page: 1,
+      images: [],
     });
   };
 
@@ -48,41 +49,34 @@ class App extends Component {
   };
 
   componentDidUpdate(_, prevState) {
-    if (
-      this.state.page !== prevState.page ||
-      this.state.query !== prevState.query
-    ) {
+    const { page, query } = this.state;
+    if (page !== prevState.page || query !== prevState.query) {
       this.setState({ loader: true });
-      getImages(this.state.query, this.state.page).then(data => {
-        if (this.state.query !== prevState.query) {
-          this.setState({
-            images: data.hits,
-            loadMore: this.state.page < Math.ceil(data.totalHits / 12),
-            loader: false,
-          });
-        } else {
-          this.setState(prevState => {
-            return {
-              images: [...prevState.images, ...data.hits],
-              loadMore: this.state.page < Math.ceil(data.totalHits / 12),
-              loader: false,
-            };
-          });
-        }
-      });
+      this.getData();
     }
   }
 
+  async getData() {
+    const { page, query } = this.state;
+    const data = await getImages(query, page);
+    this.setState(prevState => {
+      return {
+        images: [...prevState.images, ...data.hits],
+        loadMore: page < Math.ceil(data.totalHits / 12),
+        loader: false,
+      };
+    });
+  }
+
   render() {
+    const { images, loadMore, loader, showModal, modalImage } = this.state;
     return (
       <div className="App">
         <Searchbar onSubmit={this.search} />
-        <ImageGallery images={this.state.images} openModal={this.openModal} />
-        {this.state.loadMore && <LoadMoreButton onClick={this.loadMore} />}
-        {this.state.loader && <Loader />}
-        {this.state.showModal && (
-          <Modal image={this.state.modalImage} closeModal={this.closeModal} />
-        )}
+        <ImageGallery images={images} openModal={this.openModal} />
+        {loadMore && <LoadMoreButton onClick={this.loadMore} />}
+        {loader && <Loader />}
+        {showModal && <Modal image={modalImage} closeModal={this.closeModal} />}
       </div>
     );
   }
